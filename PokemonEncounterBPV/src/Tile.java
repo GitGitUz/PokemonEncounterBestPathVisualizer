@@ -5,17 +5,27 @@ public class Tile implements Comparator <Tile> {
 	
 	final static double encounterConst = 15.0;
 	
+	//0=empty 1=regular 2=source 3=finish 4=wall
 	private int cellType;
+	private TileType type; 
+	private int x;
+	private int y;
 	private int tile_ID;
 	private double encounterRate;
-	private TileType type; 
 	
 	public Tile() {}
 	
-	public Tile(int tile_ID, String type) {
+	public Tile(int tile_ID, int cellType, String type) {
 		this.tile_ID = tile_ID;
-		this.setTileType(type);
-		this.setEncounterRate();
+		this.setCellType(cellType);
+		
+		if(type.equalsIgnoreCase("empty")) {
+			this.type = null;
+			this.encounterRate = 0;
+		}else {
+			this.setTileType(type);
+			this.setEncounterRate();
+		}
 	}
 	
 	public Tile(int tile_ID, double prob) {
@@ -41,6 +51,14 @@ public class Tile implements Comparator <Tile> {
 		}
 	}
 	
+	public int getCellType() {
+		return this.cellType;
+	}
+	
+	public void setCellType(int cellType) {
+		this.cellType = cellType;
+	}
+	
 	public String getTileType() {
 		return this.type.toString();
 	}
@@ -53,7 +71,6 @@ public class Tile implements Comparator <Tile> {
 			System.exit(1);
 		}
 	}
-	
 	@Override
 	public int compare(Tile t1, Tile t2) {
 
@@ -69,7 +86,7 @@ public class Tile implements Comparator <Tile> {
 	public String toString() {
 		return this.getTileType();
 	}
-	public static void main(String[] args) {
-	
-	}
+//	public static void main(String[] args) {
+//	
+//	}
 }

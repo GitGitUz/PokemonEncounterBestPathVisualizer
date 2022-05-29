@@ -10,10 +10,12 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.collections.*?>
+<?import java.lang.String?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="510.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="530.0" prefWidth="510.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
    <children>
-      <GridPane fx:id="terrainGrid" gridLinesVisible="true">
+      <GridPane fx:id="terrainGrid" alignment="CENTER" gridLinesVisible="true" onMouseClicked="#gridClick" prefHeight="530.0" prefWidth="510.0">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -25,28 +27,8 @@
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
 		  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-		  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-		  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-		  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
         </columnConstraints>
         <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-		  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-		  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-		  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-		  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-		  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
 		  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -62,35 +44,56 @@
             <Insets left="5.0" right="5.0" top="5.0" />
          </padding>
       </GridPane>
-      <AnchorPane prefHeight="200.0" prefWidth="200.0">
+      <AnchorPane prefHeight="174.0" prefWidth="510.0">
          <children>
-           <ComboBox fx:id="tileChoices" layoutX="219.0" layoutY="16.0" maxWidth="100.0" onAction="#btnController" prefHeight="25.0" prefWidth="72.0" visibleRowCount="4" /> 
+           <ComboBox fx:id="tileChoices" layoutX="219.0" layoutY="16.0" maxWidth="100.0" onAction="#tileChosen" prefHeight="25.0" prefWidth="72.0" visibleRowCount="4">
+	           <items>
+		           <FXCollections fx:factory="observableArrayList">
+			           <String fx:value="Source" />
+			           <String fx:value="Goal" />
+			           <String fx:value="Empty" />
+			           <String fx:value="Wall" />
+		           </FXCollections>
+	           </items>
+           </ComboBox>
+     	   <ComboBox fx:id="terrainChoices" layoutX="219.0" layoutY="50.0" maxWidth="100.0" onAction="#terrainChosen" prefHeight="25.0" prefWidth="72.0" visibleRowCount="6">
+     	   		<items>
+		           <FXCollections fx:factory="observableArrayList">
+			           <String fx:value="Safe" />
+			           <String fx:value="Route" />
+			           <String fx:value="Tall Grass" />
+			           <String fx:value="Short Grass" />
+			           <String fx:value="Cave" />
+			           <String fx:value="Desert Sand" />
+		           </FXCollections>
+	            </items>
+     	   </ComboBox>
             <Label alignment="CENTER" layoutX="8.0" layoutY="4.0" minWidth="48.0" prefHeight="19.0" prefWidth="79.0" text="- Controls - ">
                <font>
                   <Font name="Arial Bold" size="14.0" />
                </font>
             </Label>
-            <Label fx:id="pLength" alignment="CENTER" layoutX="339.0" layoutY="29.0" minWidth="48.0" prefHeight="19.0" prefWidth="86.0" text="Path Length: ">
+            <Label fx:id="pLength" alignment="CENTER" layoutX="365.0" layoutY="27.0" minWidth="48.0" prefHeight="19.0" prefWidth="86.0" text="Path Length: ">
                <font>
                   <Font name="Arial" size="12.0" />
                </font>
             </Label>
-            <Label fx:id="tChecked" alignment="CENTER" layoutX="343.0" layoutY="8.0" minWidth="48.0" prefHeight="19.0" prefWidth="86.0" text="Tiles Checked:">
+            <Label fx:id="tChecked" alignment="CENTER" layoutX="365.0" layoutY="6.0" minWidth="48.0" prefHeight="19.0" prefWidth="86.0" text="Tiles Checked:">
                <font>
                   <Font name="Arial" size="12.0" />
                </font>
             </Label>
-            <Button fx:id="clearBtn" layoutX="8.0" layoutY="63.0" maxWidth="89.0" mnemonicParsing="false" onAction="#btnController" prefHeight="27.0" prefWidth="65.0" text="Clear">
+            <Button fx:id="clearBtn" layoutX="12.0" layoutY="52.0" maxWidth="89.0" mnemonicParsing="false" onMouseClicked="#clearClick" prefHeight="27.0" prefWidth="57.0" text="Clear">
                <font>
                   <Font name="Consolas" size="14.0" />
                </font>
             </Button>
-            <Button fx:id="resetBtn" layoutX="8.0" layoutY="25.0" maxWidth="89.0" mnemonicParsing="false" onAction="#btnController" prefHeight="19.0" prefWidth="65.0" text="Reset">
+            <Button fx:id="resetBtn" layoutX="12.0" layoutY="23.0" maxWidth="89.0" mnemonicParsing="false" onMouseClicked="#resetClick" prefHeight="27.0" prefWidth="57.0" text="Reset">
                <font>
                   <Font name="Consolas" size="14.0" />
                </font>
             </Button>
-            <Button fx:id="searchBtn" layoutX="346.0" layoutY="57.0" maxWidth="155.0" mnemonicParsing="false" onAction="#btnController" prefHeight="31.0" prefWidth="155.0" text="Find Best Path">
+            <Button fx:id="searchBtn" layoutX="365.0" layoutY="50.0" maxWidth="155.0" mnemonicParsing="false" onMouseClicked="#searchClick" prefHeight="31.0" prefWidth="138.0" text="Find Best Path">
                <font>
                   <Font name="Consolas" size="15.0" />
                </font>
@@ -105,7 +108,6 @@
                   <Font name="Arial" size="12.0" />
                </font>
             </Label>
-            <ComboBox fx:id="terrainChoices" layoutX="219.0" layoutY="50.0" maxWidth="100.0" onAction="#btnController" prefHeight="25.0" prefWidth="72.0" visibleRowCount="4" />
          </children>
       </AnchorPane>
    </children>

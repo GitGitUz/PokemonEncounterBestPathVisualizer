@@ -7,7 +7,6 @@ public enum TileType {
 	SHORTGRASS(25),	//0.15 	-log(0.15) = 0.82390874094 	-log(0.85) = 0.07058107428
 	TALLGRASS(30); 	//0.18 	-log(0.18) = 0.74472749489 	-log(0.82) = 0.08618614761
 
-	
 	final int baseEncounterRate;
 	
 	TileType(int baseEncounterRate){
