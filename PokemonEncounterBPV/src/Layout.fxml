@@ -46,12 +46,11 @@
       </GridPane>
       <AnchorPane prefHeight="174.0" prefWidth="510.0">
          <children>
-           <ComboBox fx:id="tileChoices" layoutX="219.0" layoutY="16.0" maxWidth="100.0" onAction="#tileChosen" prefHeight="25.0" prefWidth="72.0" visibleRowCount="4">
+           <ComboBox fx:id="tileChoices" layoutX="219.0" layoutY="16.0" maxWidth="100.0" onAction="#tileChosen" prefHeight="25.0" prefWidth="72.0" visibleRowCount="3">
 	           <items>
 		           <FXCollections fx:factory="observableArrayList">
 			           <String fx:value="Source" />
 			           <String fx:value="Goal" />
-			           <String fx:value="Empty" />
 			           <String fx:value="Wall" />
 		           </FXCollections>
 	           </items>

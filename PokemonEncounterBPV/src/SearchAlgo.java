@@ -9,23 +9,26 @@ public class SearchAlgo {
 	private int pathLength = 0;
 	Random rand = new Random();
 	
-	int numTiles; // number of tiles
+	//following needed for Dijkstra
+	int numTiles;
+	int wallTiles;
 	double prob[];
 	int prev[];
 	Set<Integer> visitedTiles;
 	Map<Integer, Tile> tilesMap;
-	Map<Integer, Tile> coordinateMap;
 	PriorityQueue<Tile> tqueue;
-	Tile[][] tileGrid;
 	List<List<Tile>> tile_AdjList;
+		
+	//needed to match with GridPane nodes--no searching used on this array, only access and update
+	Tile[][] tileGrid;
 	
 	public SearchAlgo(int numTiles) {
 		this.numTiles = numTiles;
+		wallTiles = numTiles;
 		prob = new double[numTiles]; 
 		prev = new int[numTiles];
 		visitedTiles = new HashSet<>();
 		tilesMap = new HashMap<>();
-		coordinateMap = new HashMap<>();
 		tqueue = new PriorityQueue<>(numTiles, new Tile());
 		tileGrid = new Tile[(int)Math.sqrt(numTiles)][(int)Math.sqrt(numTiles)];
 		tile_AdjList = new ArrayList<>();
@@ -41,7 +44,8 @@ public class SearchAlgo {
 		prob[src_tileID] = 0;
 		prev[src_tileID] = -1;
 		
-		while(visitedTiles.size() != numTiles) {
+		//Terminate when size of visitedTiles equals number of regular (non-Wall) tiles on the board
+		while(visitedTiles.size() != numTiles-wallTiles) {
 			
 			if(tqueue.isEmpty()) {
 				return;
@@ -63,7 +67,11 @@ public class SearchAlgo {
 		double newProb = -1;
 		
 		for(int i = 0; i < tile_AdjList.get(t).size(); i++) {
-			Tile v = tile_AdjList.get(t).get(i);
+			Tile v = tile_AdjList.get(t).get(i); 
+			
+			if(v.getCellType()==0) {	//ignores walls
+				continue;
+			}
 			
 			if(!visitedTiles.contains(v.getTileID())) {
 				edgeProb = v.getEncounterRate();
@@ -82,6 +90,9 @@ public class SearchAlgo {
 	public void printDijkstra(Map<Integer, Tile> tilesMap, int[] prev, double[] prob, int source) {
 		System.out.println("Dijkstra with Paths");
 		for(int i = 0; i < numTiles; i++) {
+			if(tilesMap.get(i).getCellType()==0) {		//ignore Wall tiles
+				continue;
+			}
 			System.out.print(source +"("+ tilesMap.get(source) + ") -->" + i + " ("+ tilesMap.get(i) + ") : Encounter Chance = " + probToPercent(prob[i]) + "% Best Path: ");
 			printPath(tilesMap, prev, i);
 			System.out.println();
@@ -111,71 +122,21 @@ public class SearchAlgo {
 		return TileType.values()[new Random().nextInt(TileType.values().length)].toString();
 	}
 	
-	public void reset() {
-		for(int i = 0; i< tileGrid.length; i++) {
-			tileGrid[i] = null;
-		}
+	private Tile getTileByCoordinate(int r, int c){
+	    return tileGrid[r][c];
 	}
 	
-	public int getSourceTileFromLocation(int r, int c) {
-		return tileGrid[r][c].getTileID();
+	private int getTileIDByCoordinate(int r, int c){
+	    return tileGrid[r][c].getTileID();
 	}
-	
-	public static void main(String[] args) {
-		
-		//int T = 9;
-		//SearchAlgo encounterBoard = new SearchAlgo(T);
-		
-//		List<List<Tile>> tile_AdjList = new ArrayList<>();
-//		
-//		for(int i = 0; i < T; i++) {
-//			List<Tile> tile = new ArrayList<Tile>();
-//			tile_AdjList.add(tile);
-//			// generate random terrain out of set of available tile types
-//			encounterBoard.tilesMap.put(i, new Tile(i, getRandomTile())); 
+//	public void reset() {
+//		for(int i = 0; i< tileGrid.length; i++) {
+//			tileGrid[i] = null;
 //		}
+//	}
 //	
-//		//this will change to retrieving from map instead of new Tile()
-//		tile_AdjList.get(0).add(new Tile(1,  "DESERTSAND"));
-//		tile_AdjList.get(0).add(new Tile(3, "SHORTGRASS"));
-//		
-//		tile_AdjList.get(1).add(new Tile(0, "SAFE"));
-//		tile_AdjList.get(1).add(new Tile(2, "TALLGRASS"));
-//		tile_AdjList.get(1).add(new Tile(4, "SAFE"));
-//		
-//		tile_AdjList.get(2).add(new Tile(1, "DESERTSAND"));
-//		tile_AdjList.get(2).add(new Tile(5, "ROUTE"));
-//		
-//		tile_AdjList.get(3).add(new Tile(0, "SAFE"));
-//		tile_AdjList.get(3).add(new Tile(4, "SAFE"));
-//		tile_AdjList.get(3).add(new Tile(6, "ROUTE"));
-//		
-//		tile_AdjList.get(4).add(new Tile(1, "DESERTSAND"));
-//		tile_AdjList.get(4).add(new Tile(3, "SHORTGRASS"));
-//		tile_AdjList.get(4).add(new Tile(5, "ROUTE"));
-//		tile_AdjList.get(4).add(new Tile(7, "DESERTSAND"));
-//		
-//		tile_AdjList.get(5).add(new Tile(2, "TALLGRASS"));
-//		tile_AdjList.get(5).add(new Tile(4, "SAFE"));
-//		tile_AdjList.get(5).add(new Tile(8, "SHORTGRASS"));
-//		
-//		tile_AdjList.get(6).add(new Tile(3, "SHORTGRASS"));
-//		tile_AdjList.get(6).add(new Tile(7, "DESERTSAND"));
-//		
-//		tile_AdjList.get(7).add(new Tile(4, "SAFE"));
-//		tile_AdjList.get(7).add(new Tile(6, "ROUTE"));
-//		tile_AdjList.get(7).add(new Tile(8, "SHORTGRASS"));
-//		
-//		tile_AdjList.get(8).add(new Tile(5, "ROUTE"));
-//		tile_AdjList.get(8).add(new Tile(7, "DESERTSAND"));
-//		
-//		Tile source = new Tile(6, "ROUTE");
-////		Tile source = encounterBoard.tilesMap.get(new Random().nextInt(T-1);
-//		
-//		encounterBoard.dijsktra(tile_AdjList, source.getTileID());
-//		encounterBoard.printDijkstra(encounterBoard.tilesMap,encounterBoard.prev, encounterBoard.prob, source.getTileID());
-		
-//		System.out.println(encounterBoard.tilesMap);
-
-	}
+//	public int getSourceTileFromLocation(int r, int c) {
+//		return tileGrid[r][c].getTileID();
+//	}
+	
 }

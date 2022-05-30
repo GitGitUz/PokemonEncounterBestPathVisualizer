@@ -5,7 +5,7 @@ public class Tile implements Comparator <Tile> {
 	
 	final static double encounterConst = 15.0;
 	
-	//0=empty 1=regular 2=source 3=finish 4=wall
+	//0=wall 1=regular 2= source 3=finish
 	private int cellType;
 	private TileType type; 
 	private int x;
@@ -15,17 +15,14 @@ public class Tile implements Comparator <Tile> {
 	
 	public Tile() {}
 	
-	public Tile(int tile_ID, int cellType, String type) {
+	//every Tile has knowledge of its x,y coordinate on the GridPane, these never change, only the cellType and TileType changes, which together determines the image shown to the user
+	public Tile(int tile_ID, int x, int y, int cellType, String type) {
+		this.x = x;
+		this.y = y;
 		this.tile_ID = tile_ID;
 		this.setCellType(cellType);
-		
-		if(type.equalsIgnoreCase("empty")) {
-			this.type = null;
-			this.encounterRate = 0;
-		}else {
-			this.setTileType(type);
-			this.setEncounterRate();
-		}
+		this.setTileType(type);
+		this.setEncounterRate();
 	}
 	
 	public Tile(int tile_ID, double prob) {
@@ -37,20 +34,6 @@ public class Tile implements Comparator <Tile> {
 		return this.tile_ID;
 	}
 	
-	public double getEncounterRate() {
-		return this.encounterRate;
-	}
-	
-	public void setEncounterRate() {
-		int baseRate = this.type.getBaseEncounterRate();
-		if(baseRate == 0) { // for SAFE tiles because you can't take the log of 0 so rate will simply be 0;
-			this.encounterRate = 0;
-		}else {
-			double prob = (baseRate * encounterConst)/2500.00;
-			this.encounterRate = -Math.log10(1-prob); // we are taking 1-prob because we want the shortest path to give us the MINIMUM probability of encounter
-		}
-	}
-	
 	public int getCellType() {
 		return this.cellType;
 	}
@@ -60,17 +43,62 @@ public class Tile implements Comparator <Tile> {
 	}
 	
 	public String getTileType() {
-		return this.type.toString();
+		if(this.type != null) {
+			return this.type.toString();
+		}else {
+			return "NULL";
+		}
 	}
 	
 	public void setTileType(String type) {
-		try{
-			this.type = TileType.valueOf(type.toUpperCase());
-		}catch(IllegalArgumentException e) {
-			System.out.printf("'%s' is not a valid tile type\n", type);
-			System.exit(1);
+		if (type.equalsIgnoreCase("wall")) {
+			this.type = null;
+		}else {
+			try {
+				this.type = TileType.valueOf(type.toUpperCase());
+				setCellType(1);
+			} catch (IllegalArgumentException e) {
+				System.out.printf("'%s' is not a valid tile type\n", type);
+				System.exit(1);
+			} 
+		}
+		setEncounterRate();
+	}
+	
+	public double getEncounterRate() {
+		return this.encounterRate;
+	}
+	
+	public void setEncounterRate() {
+		if(this.type == null) {
+			this.encounterRate = -1;
+		}else {
+			int baseRate = this.type.getBaseEncounterRate();
+			if(baseRate == 0) { // for SAFE tiles because you can't take the log of 0 so rate will simply be 0;
+				this.encounterRate = 0;
+			}else {
+				double prob = (baseRate * encounterConst)/2500.00;
+				this.encounterRate = -Math.log10(1-prob); // we are taking 1-prob because we want the shortest path to give us the MINIMUM probability of encounter
+			}
 		}
 	}
+	
+	public int getX() {
+		return this.x;
+	}
+	
+	public int getY() {
+		return this.y;
+	}
+	
+	public void setX(int x) {
+		this.x = x;
+	}
+	
+	public void setY(int y) {
+		this.y = y;
+	}
+	
 	@Override
 	public int compare(Tile t1, Tile t2) {
 
