@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
@@ -10,10 +12,8 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<?import javafx.collections.*?>
-<?import java.lang.String?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="530.0" prefWidth="510.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="530.0" prefWidth="510.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Controller">
    <children>
       <GridPane fx:id="terrainGrid" alignment="CENTER" gridLinesVisible="true" onMouseClicked="#gridClick" prefHeight="530.0" prefWidth="510.0">
         <columnConstraints>
@@ -51,11 +51,10 @@
 		           <FXCollections fx:factory="observableArrayList">
 			           <String fx:value="Source" />
 			           <String fx:value="Goal" />
-			           <String fx:value="Wall" />
 		           </FXCollections>
 	           </items>
            </ComboBox>
-     	   <ComboBox fx:id="terrainChoices" layoutX="219.0" layoutY="50.0" maxWidth="100.0" onAction="#terrainChosen" prefHeight="25.0" prefWidth="72.0" visibleRowCount="6">
+     	   <ComboBox fx:id="terrainChoices" layoutX="219.0" layoutY="50.0" maxWidth="100.0" onAction="#terrainChosen" prefHeight="25.0" prefWidth="72.0" visibleRowCount="3">
      	   		<items>
 		           <FXCollections fx:factory="observableArrayList">
 			           <String fx:value="Safe" />
@@ -64,6 +63,8 @@
 			           <String fx:value="Short Grass" />
 			           <String fx:value="Cave" />
 			           <String fx:value="Desert Sand" />
+			           <String fx:value="Wall" />
+			           
 		           </FXCollections>
 	            </items>
      	   </ComboBox>

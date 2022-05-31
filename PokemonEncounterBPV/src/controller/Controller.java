@@ -1,13 +1,7 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+package controller;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
+import java.util.*;
 import javafx.fxml.FXML;
-import javafx.geometry.HPos;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -16,9 +10,12 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.shape.Line;
+import model.SearchAlgo;
+import model.Tile;
+import model.TileType;
 
 public class Controller {
+	
 	
 	private static final int dimensions = 10;
 	private static final int T = (int) Math.pow(dimensions, 2);
@@ -28,6 +25,7 @@ public class Controller {
 	private int goalX;
 	private int goalY;
 	private boolean searching;
+	Map<String, String> imagePaths;
 	SearchAlgo algo;
 	
 	@FXML
@@ -43,12 +41,9 @@ public class Controller {
 	public void initialize() {
 		
 		resetMap();
-		int i = 0;
-		for(List<Tile> t: algo.tile_AdjList) {
-			System.out.println("Neighbors of Tile "+i+" -- CellType:  " + algo.tilesMap.get(i).getCellType()+" -- TileType:  " + algo.tilesMap.get(i).getTileType() );
-			printNeighbors(t);
-			i++;
-		}
+		linkImagePaths(imagePaths);
+		
+		algo.printAdjacencyList();
 
 		clearBtn.setOnMouseClicked(e->{clearClick();});
 		resetBtn.setOnMouseClicked(e->{resetClick();});
@@ -77,35 +72,27 @@ public class Controller {
 
 		if(terrainChoices.getValue()!= null || tileChoices.getValue() != null) {
 			Node n = (Node) e.getTarget();
-			if(n instanceof ImageView) { 
-				int row = GridPane.getRowIndex(n);
-				int col = GridPane.getColumnIndex(n);
+			if(n instanceof ImageView) {
 				
 				//logic for different combobox choices here
 				
-				int index = terrainGrid.getChildren().indexOf(n);
-				System.out.println("\nImage at Row: "+row+" Col: "+col+" Index: "+index);
-				ImageView imageView = getImageView("C:\\Users\\uzair\\git\\PokemonEncounterBestPathVisualizer\\PokemonEncounterBPV\\Images\\Safe\\s1.png");
-				terrainGrid.getChildren().remove(n);
-				terrainGrid.add(imageView, col, row);
-				algo.tileGrid[row][col].setTileType("Safe");
-				algo.tileGrid[row][col].setCellType(1); 
-				algo.tileGrid[row][col].setTileType("SAFE"); 
+				String terrain = terrainChoices.getValue();
+				String tile = tileChoices.getValue();
+				
+				if(terrain!= null) {
+					changeTerrain(n, terrain);
+				}else {
+					changeTile(n, tile);
+				}
 
 				System.out.println();
 				System.out.println();
 				System.out.println();
 				System.out.println();
 				
-				int i = 0;
-				for(List<Tile> t: algo.tile_AdjList) {
-					System.out.println("Neighbors of Tile "+i+" -- CellType:  " + algo.tilesMap.get(i).getCellType()+" -- TileType:  " + algo.tilesMap.get(i).getTileType());
-					printNeighbors(t);
-					i++;
-				}
-
+				algo.printAdjacencyList();
 //				System.out.println(isCellOccupied(terrainGrid, col, row));
-//				System.out.println("Grid Nodes: "+ terrainGrid.getChildren().size());
+				System.out.println("Grid Nodes: "+ terrainGrid.getChildren().size());
 			}
 		}
 		
@@ -114,7 +101,6 @@ public class Controller {
 	public void terrainChosen() {
 		if(terrainChoices.getValue() != null) {
 			tileChoices.getSelectionModel().clearSelection();
-			
 			//add functionality to preview image for user before they click on grid
 			System.out.println("Tile RESET");
 //			System.out.println(terrainChoices.getSelectionModel().getSelectedItem());
@@ -131,24 +117,41 @@ public class Controller {
 		}
 	}
 
-	private ImageView getImageView(String filePath) {
-		Image i = new Image(filePath);
+	private void changeTerrain(Node n, String terrain) {
+		int col = GridPane.getColumnIndex(n);
+		int row = GridPane.getRowIndex(n);
+		
+		ImageView imageView = getImageView(imagePaths.get(terrain.replaceAll("\\s","").toUpperCase()));
+		
+		terrainGrid.getChildren().remove(n);
+		terrainGrid.add(imageView, col, row);
+		
+		algo.tileGrid[row][col].setTileType(terrain.replaceAll("\\s","")); 
+	}
+	
+	private void changeTile(Node n, String tile) {
+		int col = GridPane.getColumnIndex(n);
+		int row = GridPane.getRowIndex(n);
+		
+		if((tile.equalsIgnoreCase("Source") || tile.equalsIgnoreCase("Goal")) && (algo.tileGrid[row][col].getCellType() != 0)) {
+			
+		}
+	}
+	
+	private ImageView getImageView(String fp) {
+		Image i = new Image(fp);
 		ImageView imageView = new ImageView(i);
         imageView.fitHeightProperty().bind(terrainGrid.heightProperty().subtract(25).divide(10));
         imageView.fitWidthProperty().bind(terrainGrid.widthProperty().subtract(25).divide(10));
         imageView.setPreserveRatio(false);
         return imageView;
 	}
-	
-//	public Image getImage(String filePath) {
-//		return new Image(filePath);
-//	}
 			
 	private static boolean isCellOccupied(GridPane gridPane, int column, int row){
 	    return gridPane.getChildren().stream().filter(Node::isManaged).anyMatch(n -> Objects.equals(GridPane.getRowIndex(n), row) && Objects.equals(GridPane.getColumnIndex(n), column));
 	}
 	
-//	resets map to initial state with all tiles as walls (empty white squares)
+	//resets map to initial state with all tiles as walls (empty white squares)
 	private void resetMap() {
 		algo = new SearchAlgo(T);
 		int id = 0;
@@ -163,17 +166,18 @@ public class Controller {
 //				map of tiles with their IDs as keys
 				algo.tilesMap.put(t.getTileID(), t); 
 				
-		    	ImageView imageView = getImageView("C:\\Users\\uzair\\git\\PokemonEncounterBestPathVisualizer\\PokemonEncounterBPV\\Images\\Empty.jpg");
+		    	ImageView imageView = getImageView("C:\\Users\\uzair\\git\\PokemonEncounterBestPathVisualizer\\PokemonEncounterBPV\\Images\\wall.jpg");
  		        terrainGrid.add(imageView, y, x);
  		        id++;
 		    }
 		}
 		
-		//might need to run this again and again so that encounter rates are accurate 
-		//populate adjacency lists for every Tile, this is only done once during initialization or when reset button clicked
+//		//might need to run this again and again so that encounter rates are accurate 
+//		//populate adjacency lists for every Tile, this is only done once during initialization or when reset button clicked
 		for(int i = 0; i < T; i++) {
-			algo.tile_AdjList.get(i).addAll(getNeighbors(algo.tilesMap.get(i).getX(), algo.tilesMap.get(i).getY()));
+			algo.tile_AdjList.get(i).addAll(algo.getNeighbors(algo.tilesMap.get(i).getX(), algo.tilesMap.get(i).getY()));
 		}
+		algo.printAdjacencyList();
 		
 		sourceX = -1;
 		sourceY = -1;
@@ -182,32 +186,12 @@ public class Controller {
 		searching = false;
 	}
 	
-	//gets neighbors of passed Tile from the tile array based on it's passed coordinates
-	private List<Tile> getNeighbors(int r, int c) {
-		List<Tile> neighborsList = new ArrayList<>();
-		for(int i = -1; i <= 1; i++) {
-			for(int j = -1; j <= 1; j++) {
-				if(!(i==0 && j==0)) {	//ignore when i==j==0 because that's just the same Tile
-					int x = r+i;
-					int y = c+j;
-					if((x > -1 && x < dimensions) && (y > -1 && y < dimensions)) {
-						try {
-							neighborsList.add(algo.tileGrid[x][y]);
-						} catch (Exception e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}	
-				}
-			}
+	private void linkImagePaths(Map<String, String> images) {
+		imagePaths = new HashMap<>();
+		for(TileType tt : TileType.values()) {
+			imagePaths.put(tt.toString(), tt.getFilePath());
 		}
-		return neighborsList;
 	}
 	
-	private void printNeighbors(List<Tile> t) {
-		for(Tile tile : t) {
-			System.out.println("TileID: "+tile.getTileID()+" CellType: "+tile.getCellType()+" TileType: "+tile.getTileType());
-		}
-		System.out.println();
-	}
+
 }

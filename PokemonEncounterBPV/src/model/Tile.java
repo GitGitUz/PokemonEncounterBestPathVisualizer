@@ -1,3 +1,4 @@
+package model;
 import java.util.*;
 
 
@@ -53,6 +54,7 @@ public class Tile implements Comparator <Tile> {
 	public void setTileType(String type) {
 		if (type.equalsIgnoreCase("wall")) {
 			this.type = null;
+			setCellType(0);
 		}else {
 			try {
 				this.type = TileType.valueOf(type.toUpperCase());

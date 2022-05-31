@@ -1,10 +1,7 @@
+package model;
 import java.util.*;
 
 public class SearchAlgo {
-	
-	//hash function for tile coordinates (103*row + 97*col)
-	private final int hashRow = 103;
-	private final int hashCol = 97;
 	
 	private int pathLength = 0;
 	Random rand = new Random();
@@ -15,12 +12,10 @@ public class SearchAlgo {
 	double prob[];
 	int prev[];
 	Set<Integer> visitedTiles;
-	Map<Integer, Tile> tilesMap;
 	PriorityQueue<Tile> tqueue;
-	List<List<Tile>> tile_AdjList;
-		
-	//needed to match with GridPane nodes--no searching used on this array, only access and update
-	Tile[][] tileGrid;
+	public Map<Integer, Tile> tilesMap;
+	public List<List<Tile>> tile_AdjList;
+	public Tile[][] tileGrid;
 	
 	public SearchAlgo(int numTiles) {
 		this.numTiles = numTiles;
@@ -90,7 +85,7 @@ public class SearchAlgo {
 	public void printDijkstra(Map<Integer, Tile> tilesMap, int[] prev, double[] prob, int source) {
 		System.out.println("Dijkstra with Paths");
 		for(int i = 0; i < numTiles; i++) {
-			if(tilesMap.get(i).getCellType()==0) {		//ignore Wall tiles
+			if(tilesMap.get(i).getCellType()==0) {		//ignore walls
 				continue;
 			}
 			System.out.print(source +"("+ tilesMap.get(source) + ") -->" + i + " ("+ tilesMap.get(i) + ") : Encounter Chance = " + probToPercent(prob[i]) + "% Best Path: ");
@@ -129,14 +124,39 @@ public class SearchAlgo {
 	private int getTileIDByCoordinate(int r, int c){
 	    return tileGrid[r][c].getTileID();
 	}
-//	public void reset() {
-//		for(int i = 0; i< tileGrid.length; i++) {
-//			tileGrid[i] = null;
-//		}
-//	}
-//	
-//	public int getSourceTileFromLocation(int r, int c) {
-//		return tileGrid[r][c].getTileID();
-//	}
 	
+	//gets neighbors of passed tile from the tile array based on it's passed coordinates
+	public List<Tile> getNeighbors(int r, int c) {
+		List<Tile> neighborsList = new ArrayList<>();
+		for(int i = -1; i <= 1; i++) {
+			for(int j = -1; j <= 1; j++) {
+				if(!(i==0 && j==0)) {	//ignore when i==j==0 because that's just the same Tile
+					int x = r+i;
+					int y = c+j;
+					if((x > -1 && x < (int)Math.sqrt(numTiles)) && (y > -1 && y < (int)Math.sqrt(numTiles))) {
+						try {
+							neighborsList.add(tileGrid[x][y]);
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}	
+				}
+			}
+		}
+		return neighborsList;
+	}
+	
+	//prints entire adjacency list for every tile
+	public void printAdjacencyList() {
+		int id = 0;
+		for (List<Tile> tl : tile_AdjList) {
+			System.out.println("Neighbors of Tile "+id+" -- CellType:  " + tilesMap.get(id).getCellType()+" -- TileType:  " + tilesMap.get(id).getTileType() );
+			for(Tile tile : tl) {
+				System.out.println("TileID: "+tile.getTileID()+" CellType: "+tile.getCellType()+" TileType: "+tile.getTileType());
+			}
+			System.out.println();
+			id++;
+		}
+	}
 }
