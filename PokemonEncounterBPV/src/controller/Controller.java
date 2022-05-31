@@ -3,6 +3,8 @@ package controller;
 import java.util.*;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -40,8 +42,8 @@ public class Controller {
 	@FXML
 	public void initialize() {
 		
-		resetMap();
 		linkImagePaths(imagePaths);
+		resetMap();
 		
 		algo.printAdjacencyList();
 
@@ -66,6 +68,7 @@ public class Controller {
 	
 	public void searchClick() {
 		System.out.println("Search");
+		//should have at least one tile on the board
 	}
 	
 	public void gridClick(MouseEvent e){
@@ -84,13 +87,8 @@ public class Controller {
 				}else {
 					changeTile(n, tile);
 				}
-
-				System.out.println();
-				System.out.println();
-				System.out.println();
-				System.out.println();
 				
-				algo.printAdjacencyList();
+//				algo.printAdjacencyList();
 //				System.out.println(isCellOccupied(terrainGrid, col, row));
 				System.out.println("Grid Nodes: "+ terrainGrid.getChildren().size());
 			}
@@ -121,12 +119,32 @@ public class Controller {
 		int col = GridPane.getColumnIndex(n);
 		int row = GridPane.getRowIndex(n);
 		
-		ImageView imageView = getImageView(imagePaths.get(terrain.replaceAll("\\s","").toUpperCase()));
+		//if user tries to set a tile to a type it already is, show an alert
+		if(algo.tileGrid[row][col].getTileType().equalsIgnoreCase(terrain.replaceAll("\\s","")) || (algo.tileGrid[row][col].getTileType().equalsIgnoreCase("null") && terrain.equalsIgnoreCase("wall"))) {
+			Alert a = new Alert(AlertType.INFORMATION);
+			a.setTitle("Invalid Tile Placement");
+			a.setHeaderText("The selected tile is already a " + terrain);
+			a.setContentText("Choose a different terrain or tile to place a " + terrain);
+			a.show();
+		}else {
+			
+			ImageView imageView = getImageView(imagePaths.get(terrain.replaceAll("\\s","").toUpperCase()));
+			
+			terrainGrid.getChildren().remove(n);
+			terrainGrid.add(imageView, col, row);
+			
+			//increase number of wall tiles in grid only if 
+			if(terrain.equalsIgnoreCase("wall")) {
+				algo.inceaseWallTiles();
+			}else {
+				algo.decreaseWallTiles();
+			}
+			System.out.println(algo.getWallTiles());
+
+			algo.tileGrid[row][col].setTileType(terrain.replaceAll("\\s",""));
+		}
 		
-		terrainGrid.getChildren().remove(n);
-		terrainGrid.add(imageView, col, row);
 		
-		algo.tileGrid[row][col].setTileType(terrain.replaceAll("\\s","")); 
 	}
 	
 	private void changeTile(Node n, String tile) {
@@ -151,7 +169,7 @@ public class Controller {
 	    return gridPane.getChildren().stream().filter(Node::isManaged).anyMatch(n -> Objects.equals(GridPane.getRowIndex(n), row) && Objects.equals(GridPane.getColumnIndex(n), column));
 	}
 	
-	//resets map to initial state with all tiles as walls (empty white squares)
+	//resets map and data structures to initial state with all tiles as walls (empty white squares)
 	private void resetMap() {
 		algo = new SearchAlgo(T);
 		int id = 0;
@@ -166,17 +184,13 @@ public class Controller {
 //				map of tiles with their IDs as keys
 				algo.tilesMap.put(t.getTileID(), t); 
 				
-		    	ImageView imageView = getImageView("C:\\Users\\uzair\\git\\PokemonEncounterBestPathVisualizer\\PokemonEncounterBPV\\Images\\wall.jpg");
+		    	ImageView imageView = getImageView(imagePaths.get("WALL"));
  		        terrainGrid.add(imageView, y, x);
  		        id++;
 		    }
 		}
 		
-//		//might need to run this again and again so that encounter rates are accurate 
-//		//populate adjacency lists for every Tile, this is only done once during initialization or when reset button clicked
-		for(int i = 0; i < T; i++) {
-			algo.tile_AdjList.get(i).addAll(algo.getNeighbors(algo.tilesMap.get(i).getX(), algo.tilesMap.get(i).getY()));
-		}
+		algo.populateAdjacencyList();
 		algo.printAdjacencyList();
 		
 		sourceX = -1;

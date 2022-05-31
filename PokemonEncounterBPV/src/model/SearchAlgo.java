@@ -125,7 +125,15 @@ public class SearchAlgo {
 	    return tileGrid[r][c].getTileID();
 	}
 	
-	//gets neighbors of passed tile from the tile array based on it's passed coordinates
+	
+	//populates adjacency list for all tiles
+	public void populateAdjacencyList() {
+		for(int i = 0; i < numTiles; i++) {
+			tile_AdjList.get(i).addAll(getNeighbors(tilesMap.get(i).getX(), tilesMap.get(i).getY()));
+		}
+	}
+	
+	//gets neighbors of a tile in the tile array
 	public List<Tile> getNeighbors(int r, int c) {
 		List<Tile> neighborsList = new ArrayList<>();
 		for(int i = -1; i <= 1; i++) {
@@ -137,7 +145,6 @@ public class SearchAlgo {
 						try {
 							neighborsList.add(tileGrid[x][y]);
 						} catch (Exception e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					}	
@@ -145,6 +152,17 @@ public class SearchAlgo {
 			}
 		}
 		return neighborsList;
+	}
+	
+	public int getWallTiles() {
+		return this.wallTiles;
+	}
+	
+	public void inceaseWallTiles() {
+		this.wallTiles++;
+	}
+	public void decreaseWallTiles() {
+		this.wallTiles--;
 	}
 	
 	//prints entire adjacency list for every tile
