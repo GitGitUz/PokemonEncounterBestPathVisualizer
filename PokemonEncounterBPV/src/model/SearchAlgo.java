@@ -15,6 +15,7 @@ public class SearchAlgo {
 	PriorityQueue<Tile> tqueue;
 	public Map<Integer, Tile> tilesMap;
 	public List<List<Tile>> tile_AdjList;
+	
 	public Tile[][] tileGrid;
 	
 	public SearchAlgo(int numTiles) {
@@ -29,6 +30,8 @@ public class SearchAlgo {
 		tile_AdjList = new ArrayList<>();
 	}
 	
+	
+	//need to check what happens if user defines a GOAL on an unreachable tile
 	public void dijsktra(List<List<Tile>> tile_AdjList, int src_tileID){
 		for(int i=0; i < numTiles; i++) {
 			prob[i] = Integer.MAX_VALUE;
@@ -82,6 +85,7 @@ public class SearchAlgo {
 		}
 	}
 	
+	//prints shortest path from source node to every non-wall node on grid
 	public void printDijkstra(Map<Integer, Tile> tilesMap, int[] prev, double[] prob, int source) {
 		System.out.println("Dijkstra with Paths");
 		for(int i = 0; i < numTiles; i++) {
@@ -93,7 +97,7 @@ public class SearchAlgo {
 			System.out.println();
 		}
 	}
-	
+	//helper method for main printing method
 	public void printPath(Map<Integer, Tile> tilesMap, int[] prev, int dest) {
 		if(prev[dest] == -1) {
 			System.out.print(dest + "(" + tilesMap.get(dest) + ") " );
@@ -102,7 +106,8 @@ public class SearchAlgo {
 		printPath(tilesMap, prev, prev[dest]);
 		System.out.print(dest + "(" + tilesMap.get(dest) + ") " );
 	}
-	   
+	
+	//reverses the log of encounter chance with exponential to give readable decimal percent
 	public double probToPercent(double prob) {
 		double percent = 0;
 		if(prob == 0) {
@@ -113,18 +118,10 @@ public class SearchAlgo {
 		return Math.round(percent*100.0)/100.0;
 	}
 	
+	//get a random tile type from the enum
 	public static String getRandomTile() {
 		return TileType.values()[new Random().nextInt(TileType.values().length)].toString();
 	}
-	
-	private Tile getTileByCoordinate(int r, int c){
-	    return tileGrid[r][c];
-	}
-	
-	private int getTileIDByCoordinate(int r, int c){
-	    return tileGrid[r][c].getTileID();
-	}
-	
 	
 	//populates adjacency list for all tiles
 	public void populateAdjacencyList() {
@@ -133,7 +130,7 @@ public class SearchAlgo {
 		}
 	}
 	
-	//gets neighbors of a tile in the tile array
+	//gets list of neighbors of a tile in the tile array
 	public List<Tile> getNeighbors(int r, int c) {
 		List<Tile> neighborsList = new ArrayList<>();
 		for(int i = -1; i <= 1; i++) {
@@ -154,18 +151,7 @@ public class SearchAlgo {
 		return neighborsList;
 	}
 	
-	public int getWallTiles() {
-		return this.wallTiles;
-	}
-	
-	public void inceaseWallTiles() {
-		this.wallTiles++;
-	}
-	public void decreaseWallTiles() {
-		this.wallTiles--;
-	}
-	
-	//prints entire adjacency list for every tile
+	//prints entire adjacency list
 	public void printAdjacencyList() {
 		int id = 0;
 		for (List<Tile> tl : tile_AdjList) {
@@ -177,4 +163,17 @@ public class SearchAlgo {
 			id++;
 		}
 	}
+	
+	public int getWallTiles() {
+		return this.wallTiles;
+	}
+	
+	public void inceaseWallTiles() {
+		this.wallTiles++;
+	}
+	
+	public void decreaseWallTiles() {
+		this.wallTiles--;
+	}
+		
 }

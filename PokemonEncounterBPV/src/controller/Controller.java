@@ -1,6 +1,8 @@
 package controller;
 
 import java.util.*;
+
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
@@ -8,25 +10,29 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.effect.BlurType;
+import javafx.scene.effect.InnerShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
 import model.SearchAlgo;
 import model.Tile;
 import model.TileType;
 
 public class Controller {
 	
-	
 	private static final int dimensions = 10;
 	private static final int T = (int) Math.pow(dimensions, 2);
 	
-	private Integer sourceX;
-	private Integer sourceY;
+	private int sourceX;
+	private int sourceY;
 	private int goalX;
 	private int goalY;
 	private boolean searching;
+	
 	Map<String, String> imagePaths;
 	SearchAlgo algo;
 	
@@ -125,6 +131,7 @@ public class Controller {
 			a.setTitle("Invalid Tile Placement");
 			a.setHeaderText("The selected tile is already a " + terrain);
 			a.setContentText("Choose a different terrain or tile to place a " + terrain);
+			a.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 			a.show();
 		}else {
 			
@@ -151,8 +158,85 @@ public class Controller {
 		int col = GridPane.getColumnIndex(n);
 		int row = GridPane.getRowIndex(n);
 		
-		if((tile.equalsIgnoreCase("Source") || tile.equalsIgnoreCase("Goal")) && (algo.tileGrid[row][col].getCellType() != 0)) {
+		//walls cannot be a source or a goal
+		if(algo.tileGrid[row][col].getCellType() != 0) {
 			
+			InnerShadow is = new InnerShadow(BlurType.ONE_PASS_BOX, null, 0, 1, 0, 0 );
+			is.setHeight(25);
+			is.setWidth(25);
+			
+			//placing a valid tile 		CellType: 	1-> 2/3 	2->2/3 	   3->3/2
+			
+			System.out.printf("SourceX: %d    SourceY: %d\n",sourceX,sourceY);
+			System.out.printf("GoalX: %d    GoalY: %d\n\n\n",goalX,goalY);
+			
+			
+			//if a source is set to goal or vice versa reset old values to -1
+			if(tile.equalsIgnoreCase("Source")){	//setting a proper source node				
+				is.setColor(Color.GREEN);
+				
+				if(goalX == row && goalY == col) {		//if setting a goal to source, reset goal values
+					goalX = -1;
+					goalY = -1;
+				}
+				
+				if(sourceX == -1 & sourceY == -1) {
+					algo.tileGrid[row][col].setCellType(2);
+					n.setEffect(is);													//sets new source effect to red highlight
+					sourceX = row;
+					sourceY = col;
+					System.out.printf("SourceX: %d    SourceY: %d\n",sourceX,sourceY);
+					System.out.printf("GoalX: %d    GoalY: %d\n",goalX,goalY);
+
+				}else {
+					algo.tileGrid[sourceX][sourceY].setCellType(1);
+					algo.tileGrid[row][col].setCellType(2);
+					
+					getNodeFromGridPane(terrainGrid, sourceY, sourceX).setEffect(null);		//sets previous source effect to null
+					n.setEffect(is);														//sets new source effect to red highlight
+					
+					sourceX = row;
+					sourceY = col;
+					System.out.printf("SourceX: %d    SourceY: %d\n",sourceX,sourceY);
+					System.out.printf("GoalX: %d    GoalY: %d\n",goalX,goalY);
+
+				}
+			}else {		//setting a proper goal node				
+				is.setColor(Color.RED);
+				
+				if(sourceX == row && sourceY == col) {		//if setting a source to goal, reset source coordinates
+					sourceX = -1;
+					sourceY = -1;
+				}
+				
+				if(goalX == -1 & goalY == -1) {
+					algo.tileGrid[row][col].setCellType(3);
+					n.setEffect(is);													//sets new goal effect to green highlight
+					goalX = row;
+					goalY = col;
+					System.out.printf("SourceX: %d    SourceY: %d\n",sourceX,sourceY);
+					System.out.printf("GoalX: %d    GoalY: %d\n",goalX,goalY);
+
+				}else {
+					algo.tileGrid[goalX][goalY].setCellType(1);
+					algo.tileGrid[row][col].setCellType(3);
+					
+					getNodeFromGridPane(terrainGrid, goalY, goalX).setEffect(null);		//sets previous goal effect to null
+					n.setEffect(is);													//sets new goal effect to green highlight
+					
+					goalX = row;
+					goalY = col;
+					System.out.printf("SourceX: %d    SourceY: %d\n",sourceX,sourceY);
+					System.out.printf("GoalX: %d    GoalY: %d\n",goalX,goalY);
+				}
+			}
+		}else {
+			Alert a = new Alert(AlertType.ERROR);
+			a.setTitle("Invalid " + tile +" Placement");
+			a.setHeaderText("A wall cannot be set as a " + tile);
+			a.setContentText("Choose a valid terrain tile to make a " + tile);
+			a.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+			a.show();
 		}
 	}
 	
@@ -205,6 +289,24 @@ public class Controller {
 		for(TileType tt : TileType.values()) {
 			imagePaths.put(tt.toString(), tt.getFilePath());
 		}
+	}
+	
+	private Node getNodeFromGridPane(GridPane gridPane, int col, int row) {
+	    ObservableList<Node> children = gridPane.getChildren();
+	    for (Node node : children) {
+	        Integer columnIndex = GridPane.getColumnIndex(node);
+	        Integer rowIndex = GridPane.getRowIndex(node);
+
+	        if (columnIndex == null)
+	            columnIndex = 0;
+	        if (rowIndex == null)
+	            rowIndex = 0;
+
+	        if (columnIndex == col && rowIndex == row) {
+	            return node;
+	        }
+	    }
+	    return null;
 	}
 	
 

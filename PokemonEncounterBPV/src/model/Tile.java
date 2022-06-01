@@ -6,7 +6,7 @@ public class Tile implements Comparator <Tile> {
 	
 	final static double encounterConst = 15.0;
 	
-	//0=wall 1=regular 2= source 3=finish
+	//0=wall 1=regular 2= source 3=goal
 	private int cellType;
 	private TileType type; 
 	private int x;
