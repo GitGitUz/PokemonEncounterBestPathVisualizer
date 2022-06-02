@@ -74,15 +74,7 @@ public class Controller {
 	
 	public void searchClick() {
 		searching = true;
-		
-		if(algo.getWallTiles() == T) {		//Seach not ran if all tiles are wall tiles
-			Alert a = new Alert(AlertType.ERROR);
-			a.setTitle("Cannot Find Best Path");
-			a.setHeaderText("All tiles are walls");
-			a.setContentText("Please place at least one source and one goal tile");
-			a.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-			a.show();
-		}else if((sourceX == -1 && sourceY == -1) || (goalX == -1 && goalY == -1)) {	//Search not ran if there isn't at least one source/goal tile
+		if((sourceX == -1 && sourceY == -1) || (goalX == -1 && goalY == -1)) {	//Search not ran if there isn't at least one source/goal tile
 			Alert a = new Alert(AlertType.ERROR);
 			a.setTitle("Cannot Find Best Path");
 			a.setHeaderText("No source/goal tile specified");
@@ -91,10 +83,11 @@ public class Controller {
 			a.show();
 		}else {		//valid run whether goal reachable or not
 			System.out.println();
-			System.out.println("Reached valid run");
+			System.out.println("REACHED VALID RUN!!!");
 			System.out.printf("Source: %d   SourceX: %d   SourceY: %d\n",algo.tileGrid[sourceX][sourceY].getTileID(), sourceX, sourceY);
 			System.out.printf("Goal: %d    GoalX: %d   GoalY: %d\n",algo.tileGrid[goalX][goalY].getTileID(), goalX, goalY);
-			algo.dijsktra(algo.tile_AdjList, algo.tileGrid[sourceX][sourceY].getTileID());
+			algo.dijsktra(algo.tile_AdjList, algo.tileGrid[sourceX][sourceY].getTileID(), algo.tileGrid[goalX][goalY].getTileID());
+			
 			algo.resetDijkstra();
 		} 
 	}
@@ -105,7 +98,7 @@ public class Controller {
 			Node n = (Node) e.getTarget();
 			if(n instanceof ImageView) {
 				
-				System.out.printf("Clicked On: R[%d]C[%d]\n", terrainGrid.getRowIndex(n), terrainGrid.getColumnIndex(n));
+				System.out.printf("Clicked On: R[%d]C[%d]\n", GridPane.getRowIndex(n), GridPane.getColumnIndex(n));
 				
 				//logic for different combobox choices here
 				
@@ -118,7 +111,7 @@ public class Controller {
 					changeTile(n, tile);
 				}
 				
-//				algo.printAdjacencyList();
+				algo.printAdjacencyList();
 //				System.out.println(isCellOccupied(terrainGrid, col, row));
 				System.out.println("Grid Nodes: "+ terrainGrid.getChildren().size());
 				System.out.println();
@@ -167,12 +160,14 @@ public class Controller {
 			
 			//increase number of wall tiles in grid only if 
 			if(terrain.equalsIgnoreCase("wall")) {
-				algo.inceaseWallTiles();
-			}else {
-				algo.decreaseWallTiles();
+				if(algo.tileGrid[row][col].getCellType()==2) {		//changing a source to a wall should reset the source coordinates
+					sourceX = -1;
+					sourceY = -1;
+				}else if(algo.tileGrid[row][col].getCellType() == 3){	//changing a goal to a wall should reset the goal coordinates
+					goalX = -1;
+					goalY = -1;
+				}
 			}
-			System.out.println(algo.getWallTiles());
-
 			algo.tileGrid[row][col].setTileType(terrain.replaceAll("\\s",""));
 		}
 		
@@ -280,9 +275,9 @@ public class Controller {
         return imageView;
 	}
 			
-	private static boolean isCellOccupied(GridPane gridPane, int column, int row){
-	    return gridPane.getChildren().stream().filter(Node::isManaged).anyMatch(n -> Objects.equals(GridPane.getRowIndex(n), row) && Objects.equals(GridPane.getColumnIndex(n), column));
-	}
+//	private static boolean isCellOccupied(GridPane gridPane, int column, int row){
+//	    return gridPane.getChildren().stream().filter(Node::isManaged).anyMatch(n -> Objects.equals(GridPane.getRowIndex(n), row) && Objects.equals(GridPane.getColumnIndex(n), column));
+//	}
 	
 	//resets map and data structures to initial state with all tiles as walls (empty white squares)
 	private void resetMap() {

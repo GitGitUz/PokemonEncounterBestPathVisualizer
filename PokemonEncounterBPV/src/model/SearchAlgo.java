@@ -8,19 +8,18 @@ public class SearchAlgo {
 	
 	//following needed for Dijkstra
 	int numTiles;
-	int wallTiles;
 	double prob[];
 	int prev[];
 	private Set<Integer> visitedTiles;
 	PriorityQueue<Tile> tqueue;
 	public Map<Integer, Tile> tilesMap;
 	public List<List<Tile>> tile_AdjList;
+	public boolean goalFound;
 	
 	public Tile[][] tileGrid;
 	
 	public SearchAlgo(int numTiles) {
 		this.numTiles = numTiles;
-		wallTiles = numTiles;
 		prob = new double[numTiles]; 
 		prev = new int[numTiles];
 		visitedTiles = new HashSet<>();
@@ -28,11 +27,12 @@ public class SearchAlgo {
 		tqueue = new PriorityQueue<>(numTiles, new Tile());
 		tileGrid = new Tile[(int)Math.sqrt(numTiles)][(int)Math.sqrt(numTiles)];
 		tile_AdjList = new ArrayList<>();
+		goalFound = false;
 	}
 	
 	
 	//need to check what happens if user defines a GOAL on an unreachable tile
-	public void dijsktra(List<List<Tile>> tile_AdjList, int src_tileID){
+	public void dijsktra(List<List<Tile>> tile_AdjList, int src_tileID, int goal_tileID){
 		
 		for(int i=0; i < numTiles; i++) {
 			prob[i] = Integer.MAX_VALUE;
@@ -44,26 +44,45 @@ public class SearchAlgo {
 		prev[src_tileID] = -1;
 		
 		//Terminate when size of visitedTiles equals number of regular (non-Wall) tiles on the board FIX THISSSSSS
-		while(visitedTiles.size() != numTiles-wallTiles) {
+		while(visitedTiles.size() != numTiles) {
+			
 			System.out.println();
 			System.out.println("visited Size: " + visitedTiles.size());
 			System.out.println("Visited: " + visitedTiles);
-			System.out.println("PQueue: " + tqueue.peek().getTileID());
+
+			if(tqueue.peek() == null) {
+				System.out.println("PQueue: [NULL]");
+			}else {
+				System.out.println("PQueue: [" + tqueue.peek().getTileID()+"]");
+			}
+			
 			System.out.println();
 			
 			if(tqueue.isEmpty()) {
-				System.out.println();
-				System.out.println();
-				System.out.println("PRIORITY QUEUE IS EMPTY, ");
-				System.out.println("GOAL UNREACHABLE");
-				System.out.println();
-				return;
+				
+				if(visitedTiles.contains(goal_tileID)) {
+					goalFound = true;
+				}
+				
+				for (Map.Entry<Integer, Tile> tile : tilesMap.entrySet()) {		//terminate search if all reachable nodes found with unreachable nodes remaining on board
+					if(prob[tile.getKey()] == Integer.MAX_VALUE && visitedTiles.contains(goal_tileID)) {
+						goalFound = true;
+						break;
+					}
+				}
+				
+				if(goalFound) {
+					break;
+				}else {
+					System.out.println();
+					System.out.println("GOAL UNREACHABLE");
+					System.out.println();
+					return;
+				}
 			}
-			
 			int t = tqueue.remove().getTileID();
 			
 			if(visitedTiles.contains(t) || tilesMap.get(t).getCellType() == 0){		//ignore walls
-				System.out.println(".............continuing inside while loop.........");
 				continue;
 			}
 			
@@ -71,6 +90,7 @@ public class SearchAlgo {
 			neighborTiles(t);
 		}
 		this.printDijkstra(tilesMap, prev, prob, src_tileID);
+		this.resetDijkstra();
 	}
 	
 	private void neighborTiles(int t) {
@@ -78,7 +98,9 @@ public class SearchAlgo {
 		double newProb = -1;
 		
 		for(int i = 0; i < tile_AdjList.get(t).size(); i++) {
-			Tile v = tile_AdjList.get(t).get(i); 
+//			System.out.printf("Num Neighbors for %d: %d\n", t,  tile_AdjList.get(t).size());
+			Tile v = tile_AdjList.get(t).get(i);
+//			System.out.printf("Neighbor of %d: %d\n",t,v.getTileID());
 			
 			if(v.getCellType()==0) {	//ignores walls
 				continue;
@@ -98,9 +120,7 @@ public class SearchAlgo {
 					System.out.println();
 					prev[v.getTileID()] = t;
 				}
-				if(!(v.getTileID() == 0)) {
-					tqueue.add(new Tile(v.getTileID(), prob[v.getTileID()]));
-				}
+				tqueue.add(new Tile(v.getTileID(), prob[v.getTileID()]));
 			}
 		}
 	}
@@ -110,7 +130,7 @@ public class SearchAlgo {
 		System.out.println("Dijkstra with Paths");
 		for(int i = 0; i < numTiles; i++) {
 //			System.out.printf("RECUR: %d CellType: %d\n", tilesMap.get(i).getTileID(), tilesMap.get(i).getCellType());
-			if(tilesMap.get(i).getCellType()==0) {		//ignore walls
+			if(!visitedTiles.contains(tilesMap.get(i).getTileID())) {		//ignore walls
 				continue;
 			} 
 			System.out.print("["+tilesMap.get(source).getX() + "]["+ tilesMap.get(source).getY() + "] " +"("+ tilesMap.get(source) + ") -->" + 
@@ -120,18 +140,16 @@ public class SearchAlgo {
 			System.out.println();
 		}
 	}
+	
 	//helper method for main printing method
 	public void printPath(Map<Integer, Tile> tilesMap, int[] prev, int dest) {
 		if(prev[dest] == -1) {
 			System.out.print(dest + "(" + tilesMap.get(dest) + ") ");
 			return;
 		}
-		if(!(tilesMap.get(dest).getCellType()==0)) {
-			printPath(tilesMap, prev, prev[dest]);
-			System.out.print(dest + "(" + tilesMap.get(dest) + ") ");
-		}else {
-			return;
-		}
+		printPath(tilesMap, prev, prev[dest]);
+		System.out.print(dest + "(" + tilesMap.get(dest) + ") ");
+		return;
 	}
 	
 	//reverses the log of encounter chance with exponential to give readable decimal percent
@@ -141,8 +159,6 @@ public class SearchAlgo {
 			return percent;
 		}else {
 			percent = ((Math.pow(2.00, -prob)-1) * -100);
-//			percent = ((Math.pow(2.00, prob)) * 100);
-
 		}
 		return Math.round(percent*100.0)/100.0;
 	}
@@ -193,23 +209,10 @@ public class SearchAlgo {
 		}
 	}
 	
-	public int getWallTiles() {
-		return this.wallTiles;
-	}
-	
-	public void inceaseWallTiles() {
-		this.wallTiles++;
-		tqueue = new PriorityQueue<>(numTiles-wallTiles, new Tile());
-	}
-	
-	public void decreaseWallTiles() {
-		this.wallTiles--;
-		tqueue = new PriorityQueue<>(numTiles-wallTiles, new Tile());
-	}
-	
 	public void resetDijkstra() {
 		this.visitedTiles.clear();
-		tqueue.clear();
+		this.tqueue.clear();
+		this.goalFound = false;
 	}
 		
 }

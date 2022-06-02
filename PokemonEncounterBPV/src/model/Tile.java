@@ -81,7 +81,6 @@ public class Tile implements Comparator <Tile> {
 			}else {
 				double prob = (baseRate * encounterConst)/1500.00;
 				this.encounterRate = -log2(1-prob);
-//				this.encounterRate = log2(prob);	//taking log(base 2) because turning multiplication of probabilities into addition, will reverse and show as a percentage at the end of search
 			}
 		}
 	}
