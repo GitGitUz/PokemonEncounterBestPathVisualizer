@@ -11,7 +11,7 @@ public class SearchAlgo {
 	int wallTiles;
 	double prob[];
 	int prev[];
-	Set<Integer> visitedTiles;
+	private Set<Integer> visitedTiles;
 	PriorityQueue<Tile> tqueue;
 	public Map<Integer, Tile> tilesMap;
 	public List<List<Tile>> tile_AdjList;
@@ -33,6 +33,7 @@ public class SearchAlgo {
 	
 	//need to check what happens if user defines a GOAL on an unreachable tile
 	public void dijsktra(List<List<Tile>> tile_AdjList, int src_tileID){
+		
 		for(int i=0; i < numTiles; i++) {
 			prob[i] = Integer.MAX_VALUE;
 		}
@@ -42,22 +43,34 @@ public class SearchAlgo {
 		prob[src_tileID] = 0;
 		prev[src_tileID] = -1;
 		
-		//Terminate when size of visitedTiles equals number of regular (non-Wall) tiles on the board
+		//Terminate when size of visitedTiles equals number of regular (non-Wall) tiles on the board FIX THISSSSSS
 		while(visitedTiles.size() != numTiles-wallTiles) {
+			System.out.println();
+			System.out.println("visited Size: " + visitedTiles.size());
+			System.out.println("Visited: " + visitedTiles);
+			System.out.println("PQueue: " + tqueue.peek().getTileID());
+			System.out.println();
 			
 			if(tqueue.isEmpty()) {
+				System.out.println();
+				System.out.println();
+				System.out.println("PRIORITY QUEUE IS EMPTY, ");
+				System.out.println("GOAL UNREACHABLE");
+				System.out.println();
 				return;
 			}
 			
 			int t = tqueue.remove().getTileID();
 			
-			if(visitedTiles.contains(t)){
+			if(visitedTiles.contains(t) || tilesMap.get(t).getCellType() == 0){		//ignore walls
+				System.out.println(".............continuing inside while loop.........");
 				continue;
 			}
 			
 			visitedTiles.add(t);
 			neighborTiles(t);
 		}
+		this.printDijkstra(tilesMap, prev, prob, src_tileID);
 	}
 	
 	private void neighborTiles(int t) {
@@ -72,15 +85,22 @@ public class SearchAlgo {
 			}
 			
 			if(!visitedTiles.contains(v.getTileID())) {
+				
+				//ADD SOME LOGIC HERE TO MORE RANDOMLY GENERATE ENCOUNTERS (40% SKIP CHANCE THEN RANDOM NUM B/W 0-1500)
 				edgeProb = v.getEncounterRate();
 				newProb = prob[t] + edgeProb;
 				
 				if(newProb < prob[v.getTileID()]) {
+					System.out.println();
+					System.out.printf("PREVIOUS PROB for %d: %f\n",v.getTileID(), prob[v.getTileID()]);
 					prob[v.getTileID()] = newProb;
+					System.out.printf("AFTER PROB for %d: %f\n",v.getTileID(), prob[v.getTileID()]);
+					System.out.println();
 					prev[v.getTileID()] = t;
 				}
-				
-				tqueue.add(new Tile(v.getTileID(), prob[v.getTileID()]));
+				if(!(v.getTileID() == 0)) {
+					tqueue.add(new Tile(v.getTileID(), prob[v.getTileID()]));
+				}
 			}
 		}
 	}
@@ -89,10 +109,13 @@ public class SearchAlgo {
 	public void printDijkstra(Map<Integer, Tile> tilesMap, int[] prev, double[] prob, int source) {
 		System.out.println("Dijkstra with Paths");
 		for(int i = 0; i < numTiles; i++) {
+//			System.out.printf("RECUR: %d CellType: %d\n", tilesMap.get(i).getTileID(), tilesMap.get(i).getCellType());
 			if(tilesMap.get(i).getCellType()==0) {		//ignore walls
 				continue;
-			}
-			System.out.print(source +"("+ tilesMap.get(source) + ") -->" + i + " ("+ tilesMap.get(i) + ") : Encounter Chance = " + probToPercent(prob[i]) + "% Best Path: ");
+			} 
+			System.out.print("["+tilesMap.get(source).getX() + "]["+ tilesMap.get(source).getY() + "] " +"("+ tilesMap.get(source) + ") -->" + 
+							 "["+tilesMap.get(i).getX() + "]["+ tilesMap.get(i).getY() + "] " + " ("+ tilesMap.get(i) + ") : "
+							 		+ "Encounter Chance: Prob ["+ prob[i]+"] Percent = " + probToPercent(prob[i]) + "% Best Path: ");
 			printPath(tilesMap, prev, i);
 			System.out.println();
 		}
@@ -100,11 +123,15 @@ public class SearchAlgo {
 	//helper method for main printing method
 	public void printPath(Map<Integer, Tile> tilesMap, int[] prev, int dest) {
 		if(prev[dest] == -1) {
-			System.out.print(dest + "(" + tilesMap.get(dest) + ") " );
+			System.out.print(dest + "(" + tilesMap.get(dest) + ") ");
 			return;
 		}
-		printPath(tilesMap, prev, prev[dest]);
-		System.out.print(dest + "(" + tilesMap.get(dest) + ") " );
+		if(!(tilesMap.get(dest).getCellType()==0)) {
+			printPath(tilesMap, prev, prev[dest]);
+			System.out.print(dest + "(" + tilesMap.get(dest) + ") ");
+		}else {
+			return;
+		}
 	}
 	
 	//reverses the log of encounter chance with exponential to give readable decimal percent
@@ -113,7 +140,9 @@ public class SearchAlgo {
 		if(prob == 0) {
 			return percent;
 		}else {
-			percent = ((Math.pow(10.00, -prob)-1) * -100);
+			percent = ((Math.pow(2.00, -prob)-1) * -100);
+//			percent = ((Math.pow(2.00, prob)) * 100);
+
 		}
 		return Math.round(percent*100.0)/100.0;
 	}
@@ -170,10 +199,17 @@ public class SearchAlgo {
 	
 	public void inceaseWallTiles() {
 		this.wallTiles++;
+		tqueue = new PriorityQueue<>(numTiles-wallTiles, new Tile());
 	}
 	
 	public void decreaseWallTiles() {
 		this.wallTiles--;
+		tqueue = new PriorityQueue<>(numTiles-wallTiles, new Tile());
+	}
+	
+	public void resetDijkstra() {
+		this.visitedTiles.clear();
+		tqueue.clear();
 	}
 		
 }

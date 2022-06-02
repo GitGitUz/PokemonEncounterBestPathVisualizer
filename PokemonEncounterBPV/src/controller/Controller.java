@@ -73,8 +73,30 @@ public class Controller {
 	}
 	
 	public void searchClick() {
-		System.out.println("Search");
-		//should have at least one tile on the board
+		searching = true;
+		
+		if(algo.getWallTiles() == T) {		//Seach not ran if all tiles are wall tiles
+			Alert a = new Alert(AlertType.ERROR);
+			a.setTitle("Cannot Find Best Path");
+			a.setHeaderText("All tiles are walls");
+			a.setContentText("Please place at least one source and one goal tile");
+			a.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+			a.show();
+		}else if((sourceX == -1 && sourceY == -1) || (goalX == -1 && goalY == -1)) {	//Search not ran if there isn't at least one source/goal tile
+			Alert a = new Alert(AlertType.ERROR);
+			a.setTitle("Cannot Find Best Path");
+			a.setHeaderText("No source/goal tile specified");
+			a.setContentText("Please place at least one source and one goal tile");
+			a.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+			a.show();
+		}else {		//valid run whether goal reachable or not
+			System.out.println();
+			System.out.println("Reached valid run");
+			System.out.printf("Source: %d   SourceX: %d   SourceY: %d\n",algo.tileGrid[sourceX][sourceY].getTileID(), sourceX, sourceY);
+			System.out.printf("Goal: %d    GoalX: %d   GoalY: %d\n",algo.tileGrid[goalX][goalY].getTileID(), goalX, goalY);
+			algo.dijsktra(algo.tile_AdjList, algo.tileGrid[sourceX][sourceY].getTileID());
+			algo.resetDijkstra();
+		} 
 	}
 	
 	public void gridClick(MouseEvent e){
@@ -82,6 +104,8 @@ public class Controller {
 		if(terrainChoices.getValue()!= null || tileChoices.getValue() != null) {
 			Node n = (Node) e.getTarget();
 			if(n instanceof ImageView) {
+				
+				System.out.printf("Clicked On: R[%d]C[%d]\n", terrainGrid.getRowIndex(n), terrainGrid.getColumnIndex(n));
 				
 				//logic for different combobox choices here
 				
@@ -97,6 +121,7 @@ public class Controller {
 //				algo.printAdjacencyList();
 //				System.out.println(isCellOccupied(terrainGrid, col, row));
 				System.out.println("Grid Nodes: "+ terrainGrid.getChildren().size());
+				System.out.println();
 			}
 		}
 		
@@ -192,7 +217,10 @@ public class Controller {
 					algo.tileGrid[sourceX][sourceY].setCellType(1);
 					algo.tileGrid[row][col].setCellType(2);
 					
-					getNodeFromGridPane(terrainGrid, sourceY, sourceX).setEffect(null);		//sets previous source effect to null
+					Node s = getNodeFromGridPane(terrainGrid, sourceY, sourceX);		//sets previous source effect to null
+					System.out.printf("OLD SOURCE: %d %d\n", GridPane.getRowIndex(s), GridPane.getColumnIndex(s));
+					s.setEffect(null);
+					
 					n.setEffect(is);														//sets new source effect to red highlight
 					
 					sourceX = row;
@@ -221,7 +249,10 @@ public class Controller {
 					algo.tileGrid[goalX][goalY].setCellType(1);
 					algo.tileGrid[row][col].setCellType(3);
 					
-					getNodeFromGridPane(terrainGrid, goalY, goalX).setEffect(null);		//sets previous goal effect to null
+					Node g = getNodeFromGridPane(terrainGrid, goalY, goalX);
+					System.out.printf("OLD GOAL: %d %d\n", GridPane.getRowIndex(g), GridPane.getColumnIndex(g));
+					g.setEffect(null);//sets previous goal effect to null
+					
 					n.setEffect(is);													//sets new goal effect to green highlight
 					
 					goalX = row;
@@ -257,6 +288,10 @@ public class Controller {
 	private void resetMap() {
 		algo = new SearchAlgo(T);
 		int id = 0;
+		if(terrainGrid.getChildren().size() > 1) {
+    		terrainGrid.getChildren().removeAll(terrainGrid.getChildren());
+    	}
+	    System.out.println(terrainGrid.getChildren().size());
 		for (int x = 0; x < dimensions; x++) {
 		    for (int y = 0; y < dimensions; y++) {
 		    	Tile t = new Tile(id,x,y,0,"wall");
@@ -269,7 +304,8 @@ public class Controller {
 				algo.tilesMap.put(t.getTileID(), t); 
 				
 		    	ImageView imageView = getImageView(imagePaths.get("WALL"));
- 		        terrainGrid.add(imageView, y, x);
+		    	
+		    	terrainGrid.add(imageView, y, x);
  		        id++;
 		    }
 		}
@@ -306,6 +342,7 @@ public class Controller {
 	            return node;
 	        }
 	    }
+	    System.out.println("im returning null lol");
 	    return null;
 	}
 	

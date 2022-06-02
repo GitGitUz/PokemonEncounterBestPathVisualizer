@@ -79,8 +79,9 @@ public class Tile implements Comparator <Tile> {
 			if(baseRate == 0) { // for SAFE tiles because you can't take the log of 0 so rate will simply be 0;
 				this.encounterRate = 0;
 			}else {
-				double prob = (baseRate * encounterConst)/2500.00;
-				this.encounterRate = -Math.log10(1-prob); // we are taking 1-prob because we want the shortest path to give us the MINIMUM probability of encounter
+				double prob = (baseRate * encounterConst)/1500.00;
+				this.encounterRate = -log2(1-prob);
+//				this.encounterRate = log2(prob);	//taking log(base 2) because turning multiplication of probabilities into addition, will reverse and show as a percentage at the end of search
 			}
 		}
 	}
@@ -100,6 +101,11 @@ public class Tile implements Comparator <Tile> {
 	public void setY(int y) {
 		this.y = y;
 	}
+	
+	public static double log2(double N){
+        double result = (double)(Math.log(N) / Math.log(2));
+        return result;
+    }
 	
 	@Override
 	public int compare(Tile t1, Tile t2) {
