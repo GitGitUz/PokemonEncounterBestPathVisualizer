@@ -1,6 +1,8 @@
 package model;
 
 import java.io.IOException;
+
+import controller.Controller;
 import javafx.fxml.*;
 import javafx.application.Application;
 import javafx.scene.Parent;
@@ -16,7 +18,9 @@ public class Main extends Application{
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		try {
-			Parent root = FXMLLoader.load(getClass().getResource("../view/Layout.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Layout.fxml"));
+			loader.setController(new Controller());
+			Parent root = loader.load();
 			Scene scene = new Scene(root);
 			primaryStage.setTitle("Pokemon Path Visualizer");
 			primaryStage.setScene(scene);				

@@ -43,6 +43,10 @@ public class Controller {
 	@FXML
 	private Label pLength, eProb;
 	
+	
+	public Controller() {
+		
+	}
 	@FXML
 	public void initialize() {
 		
@@ -229,21 +233,21 @@ public class Controller {
 					n.setEffect(is);	//sets new source effect to green outline
 					sourceX = row;
 					sourceY = col;
-					System.out.printf("SourceX: %d    SourceY: %d\n",sourceX,sourceY);
-					System.out.printf("GoalX: %d    GoalY: %d\n",goalX,goalY);
+//					System.out.printf("SourceX: %d    SourceY: %d\n",sourceX,sourceY);
+//					System.out.printf("GoalX: %d    GoalY: %d\n",goalX,goalY);
 				}else {		//prior source exists
 					algo.tileGrid[sourceX][sourceY].setCellType(1);
 					algo.tileGrid[row][col].setCellType(2);
 					
 					Node s = getNodeFromGridPane(terrainGrid, sourceY, sourceX);	//sets previous source effect to null
-					System.out.printf("OLD SOURCE: %d %d\n", GridPane.getRowIndex(s), GridPane.getColumnIndex(s));
+//					System.out.printf("OLD SOURCE: %d %d\n", GridPane.getRowIndex(s), GridPane.getColumnIndex(s));
 					s.setEffect(null);
 					n.setEffect(is);	//sets new source effect to green outline
 					
 					sourceX = row;
 					sourceY = col;
-					System.out.printf("SourceX: %d    SourceY: %d\n",sourceX,sourceY);
-					System.out.printf("GoalX: %d    GoalY: %d\n",goalX,goalY);
+//					System.out.printf("SourceX: %d    SourceY: %d\n",sourceX,sourceY);
+//					System.out.printf("GoalX: %d    GoalY: %d\n",goalX,goalY);
 				}
 			}else {		//setting a proper goal node				
 				is.setColor(Color.RED);
@@ -257,15 +261,15 @@ public class Controller {
 					n.setEffect(is);	//sets new goal effect to red outline
 					goalX = row;
 					goalY = col;
-					System.out.printf("SourceX: %d    SourceY: %d\n",sourceX,sourceY);
-					System.out.printf("GoalX: %d    GoalY: %d\n",goalX,goalY);
+//					System.out.printf("SourceX: %d    SourceY: %d\n",sourceX,sourceY);
+//					System.out.printf("GoalX: %d    GoalY: %d\n",goalX,goalY);
 
 				}else {		//prior goal exists
 					algo.tileGrid[goalX][goalY].setCellType(1);
 					algo.tileGrid[row][col].setCellType(3);
 					
 					Node g = getNodeFromGridPane(terrainGrid, goalY, goalX);
-					System.out.printf("OLD GOAL: %d %d\n", GridPane.getRowIndex(g), GridPane.getColumnIndex(g));
+//					System.out.printf("OLD GOAL: %d %d\n", GridPane.getRowIndex(g), GridPane.getColumnIndex(g));
 					g.setEffect(null);	//sets previous goal effect to null
 					
 					n.setEffect(is);	//sets new goal effect to red outline
@@ -342,7 +346,7 @@ public class Controller {
 		}
 		
 		algo.populateAdjacencyList();
-		algo.printAdjacencyList();
+//		algo.printAdjacencyList();
 		
 		sourceX = -1;
 		sourceY = -1;
