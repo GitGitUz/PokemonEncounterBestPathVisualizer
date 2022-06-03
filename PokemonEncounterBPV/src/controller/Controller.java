@@ -43,7 +43,7 @@ public class Controller {
 	@FXML
 	private ComboBox<String> tileChoices, terrainChoices;
 	@FXML
-	private Label pLength, tChecked;
+	private Label pLength, eProb;
 	
 	@FXML
 	public void initialize() {
@@ -62,7 +62,21 @@ public class Controller {
 	}
 	
 	public void clearClick() {
-		System.out.println("Clear");
+		pLength.setText("Path Length:");
+		eProb.setText("Encounter Probability:");
+		
+		if(terrainChoices.isDisable()) {
+			terrainChoices.setDisable(false);
+		}
+		if(tileChoices.isDisable()) {
+			tileChoices.setDisable(false);
+		}
+		if(searchBtn.isDisable()) {
+			searchBtn.setDisable(false);
+		}
+		
+		//clear the path from previous Dijkstra
+		
 	}
 	
 	public void resetClick() {
@@ -86,10 +100,32 @@ public class Controller {
 			System.out.println("REACHED VALID RUN!!!");
 			System.out.printf("Source: %d   SourceX: %d   SourceY: %d\n",algo.tileGrid[sourceX][sourceY].getTileID(), sourceX, sourceY);
 			System.out.printf("Goal: %d    GoalX: %d   GoalY: %d\n",algo.tileGrid[goalX][goalY].getTileID(), goalX, goalY);
-			algo.dijsktra(algo.tile_AdjList, algo.tileGrid[sourceX][sourceY].getTileID(), algo.tileGrid[goalX][goalY].getTileID());
-			
+			showBestPath(algo.dijsktra(algo.tile_AdjList, algo.tileGrid[sourceX][sourceY].getTileID(), algo.tileGrid[goalX][goalY].getTileID()));
+			eProb.setText("Encounter Probability: "+ algo.getProbPercentFromTile(algo.tileGrid[goalX][goalY].getTileID())+"%");
 			algo.resetDijkstra();
 		} 
+	}
+	
+	private void showBestPath(List<Tile> bp) {
+		System.out.println();
+		System.out.println(bp.size());
+		System.out.println(bp);
+		
+		InnerShadow is = new InnerShadow(BlurType.ONE_PASS_BOX, Color.GREEN, 0, 1, 0, 0 );
+		is.setHeight(25);
+		is.setWidth(25);
+		
+		for(Tile t : bp) {
+			Node temp = getNodeFromGridPane(terrainGrid, t.getY(), t.getX());
+			System.out.println("here");
+			temp.setEffect(is);
+		}
+		pLength.setText("Path Length: " + bp.size());
+		
+		//these will re-enabled once user presses Clear button
+		tileChoices.setDisable(true);
+		terrainChoices.setDisable(true);
+		searchBtn.setDisable(true);
 	}
 	
 	public void gridClick(MouseEvent e){
@@ -193,7 +229,7 @@ public class Controller {
 			
 			//if a source is set to goal or vice versa reset old values to -1
 			if(tile.equalsIgnoreCase("Source")){	//setting a proper source node				
-				is.setColor(Color.GREEN);
+				is.setColor(Color.RED);
 				
 				if(goalX == row && goalY == col) {		//if setting a goal to source, reset goal values
 					goalX = -1;
@@ -225,7 +261,7 @@ public class Controller {
 
 				}
 			}else {		//setting a proper goal node				
-				is.setColor(Color.RED);
+				is.setColor(Color.GREEN);
 				
 				if(sourceX == row && sourceY == col) {		//if setting a source to goal, reset source coordinates
 					sourceX = -1;
@@ -313,6 +349,8 @@ public class Controller {
 		goalX = -1;
 		goalY = -1;
 		searching = false;
+		eProb.setText("Encounter Probability:");
+		pLength.setText("Path Length:");
 	}
 	
 	private void linkImagePaths(Map<String, String> images) {

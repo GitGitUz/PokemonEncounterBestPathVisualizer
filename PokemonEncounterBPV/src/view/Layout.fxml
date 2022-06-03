@@ -46,7 +46,7 @@
       </GridPane>
       <AnchorPane prefHeight="174.0" prefWidth="510.0">
          <children>
-           <ComboBox fx:id="tileChoices" layoutX="219.0" layoutY="16.0" maxWidth="105.0" onAction="#tileChosen" prefHeight="25.0" prefWidth="105.0" visibleRowCount="3">
+           <ComboBox fx:id="tileChoices" layoutX="202.0" layoutY="16.0" maxWidth="105.0" onAction="#tileChosen" prefHeight="25.0" prefWidth="105.0" visibleRowCount="3">
 	           <items>
 		           <FXCollections fx:factory="observableArrayList">
 			           <String fx:value="Source" />
@@ -54,7 +54,7 @@
 		           </FXCollections>
 	           </items>
            </ComboBox>
-     	   <ComboBox fx:id="terrainChoices" layoutX="219.0" layoutY="50.0" maxWidth="105.0" onAction="#terrainChosen" prefHeight="25.0" prefWidth="105.0" visibleRowCount="3">
+     	   <ComboBox fx:id="terrainChoices" layoutX="203.0" layoutY="50.0" maxWidth="105.0" onAction="#terrainChosen" prefHeight="25.0" prefWidth="105.0" visibleRowCount="3">
      	   		<items>
 		           <FXCollections fx:factory="observableArrayList">
 			           <String fx:value="Safe" />
@@ -73,12 +73,12 @@
                   <Font name="Arial Bold" size="14.0" />
                </font>
             </Label>
-            <Label fx:id="pLength" alignment="CENTER" layoutX="365.0" layoutY="27.0" minWidth="48.0" prefHeight="19.0" prefWidth="86.0" text="Path Length: ">
+            <Label fx:id="pLength" alignment="CENTER" layoutX="323.0" layoutY="6.0" minWidth="48.0" prefHeight="19.0" prefWidth="124.0" text="Path Length: ">
                <font>
                   <Font name="Arial" size="12.0" />
                </font>
             </Label>
-            <Label fx:id="tChecked" alignment="CENTER" layoutX="365.0" layoutY="6.0" minWidth="48.0" prefHeight="19.0" prefWidth="86.0" text="Tiles Checked:">
+            <Label fx:id="eProb" alignment="CENTER" layoutX="323.0" layoutY="27.0" minWidth="48.0" prefHeight="19.0" prefWidth="173.0" text="Encounter Probability: ">
                <font>
                   <Font name="Arial" size="12.0" />
                </font>
@@ -93,17 +93,17 @@
                   <Font name="Consolas" size="14.0" />
                </font>
             </Button>
-            <Button fx:id="searchBtn" layoutX="365.0" layoutY="50.0" maxWidth="155.0" mnemonicParsing="false" onMouseClicked="#searchClick" prefHeight="31.0" prefWidth="138.0" text="Find Best Path">
+            <Button fx:id="searchBtn" layoutX="349.0" layoutY="50.0" maxWidth="155.0" mnemonicParsing="false" onMouseClicked="#searchClick" prefHeight="31.0" prefWidth="155.0" text="Find Best Path">
                <font>
                   <Font name="Consolas" size="15.0" />
                </font>
             </Button>
-            <Label alignment="CENTER_RIGHT" layoutX="165.0" layoutY="16.0" minWidth="48.0" prefHeight="25.0" prefWidth="50.0" text="Set Tile:">
+            <Label alignment="CENTER_RIGHT" layoutX="145.0" layoutY="16.0" minWidth="48.0" prefHeight="25.0" prefWidth="50.0" text="Set Tile:">
                <font>
                   <Font name="Arial" size="12.0" />
                </font>
             </Label>
-            <Label alignment="CENTER_RIGHT" layoutX="87.0" layoutY="50.0" minWidth="48.0" prefHeight="25.0" prefWidth="128.0" text="Change Tile Terrain:">
+            <Label alignment="CENTER_RIGHT" layoutX="79.0" layoutY="50.0" minWidth="48.0" prefHeight="25.0" prefWidth="116.0" text="Change Tile Terrain:">
                <font>
                   <Font name="Arial" size="12.0" />
                </font>
