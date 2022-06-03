@@ -3,7 +3,6 @@ import java.util.*;
 
 public class SearchAlgo {
 	
-	private int pathLength = 0;
 	Random rand = new Random();
 	
 	//following needed for Dijkstra
@@ -17,6 +16,7 @@ public class SearchAlgo {
 	public boolean goalFound;
 	public List<Tile> bestPath;
 	
+	//2D array of tiles modeling the GridPane in UI
 	public Tile[][] tileGrid;
 	
 	public SearchAlgo(int numTiles) {
@@ -32,8 +32,7 @@ public class SearchAlgo {
 		bestPath = new ArrayList<>();
 	}
 	
-	
-	//need to check what happens if user defines a GOAL on an unreachable tile
+	//main method running dijkstra, calls other methods and return list of tiles representing best path from source to goal
 	public List<Tile> dijsktra(List<List<Tile>> tile_AdjList, int src_tileID, int goal_tileID){
 		
 		for(int i=0; i < numTiles; i++) {
@@ -45,20 +44,18 @@ public class SearchAlgo {
 		prob[src_tileID] = 0;
 		prev[src_tileID] = -1;
 		
-		//Terminate when size of visitedTiles equals number of regular (non-Wall) tiles on the board FIX THISSSSSS
 		while(visitedTiles.size() != numTiles) {
 			
-			System.out.println();
-			System.out.println("visited Size: " + visitedTiles.size());
-			System.out.println("Visited: " + visitedTiles);
+//			System.out.println();
+//			System.out.println("visited Size: " + visitedTiles.size());
+//			System.out.println("Visited: " + visitedTiles);
 
-			if(tqueue.peek() == null) {
-				System.out.println("PQueue: [NULL]");
-			}else {
-				System.out.println("PQueue: [" + tqueue.peek().getTileID()+"]");
-			}
-			
-			System.out.println();
+//			if(tqueue.peek() == null) {
+//				System.out.println("PQueue: [NULL]");
+//			}else {
+//				System.out.println("PQueue: [" + tqueue.peek().getTileID()+"]");
+//			}
+//			System.out.println();
 			
 			if(tqueue.isEmpty()) {
 				
@@ -76,14 +73,13 @@ public class SearchAlgo {
 				if(goalFound) {
 					break;
 				}else {
-					System.out.println();
-					System.out.println("GOAL UNREACHABLE");
-					System.out.println();
+//					System.out.println();
+//					System.out.println("GOAL UNREACHABLE");
+//					System.out.println();
 					return null;
 				}
 			}
 			int t = tqueue.remove().getTileID();
-			
 			if(visitedTiles.contains(t) || tilesMap.get(t).getCellType() == 0){		//ignore walls
 				continue;
 			}
@@ -97,6 +93,7 @@ public class SearchAlgo {
 		return bestPath;
 	}
 	
+	//explore the neighbors of given tile, used by Dijkstra method
 	private void neighborTiles(int t) {
 		double edgeProb = -1;
 		double newProb = -1;
@@ -117,11 +114,11 @@ public class SearchAlgo {
 				newProb = prob[t] + edgeProb;
 				
 				if(newProb < prob[v.getTileID()]) {
-					System.out.println();
-					System.out.printf("PREVIOUS PROB for %d: %f\n",v.getTileID(), prob[v.getTileID()]);
+//					System.out.println();
+//					System.out.printf("PREVIOUS PROB for %d: %f\n",v.getTileID(), prob[v.getTileID()]);
 					prob[v.getTileID()] = newProb;
-					System.out.printf("AFTER PROB for %d: %f\n",v.getTileID(), prob[v.getTileID()]);
-					System.out.println();
+//					System.out.printf("AFTER PROB for %d: %f\n",v.getTileID(), prob[v.getTileID()]);
+//					System.out.println();
 					prev[v.getTileID()] = t;
 				}
 				tqueue.add(new Tile(v.getTileID(), prob[v.getTileID()]));
@@ -136,19 +133,16 @@ public class SearchAlgo {
 							+ "Encounter Chance: Prob ["+ prob[goal]+"] Percent = " + probToPercent(prob[goal]) + "% Best Path: ");
 		printPath(tilesMap, prev, goal);
 		System.out.println();
-		System.out.println();
-		System.out.println();
-		System.out.println();
 	}
 	
+	//populates the list with the best path from source to goal in order
 	public void createBestPath(Map<Integer, Tile> tilesMap, int[] prev, int dest) {
 		if(prev[dest] == -1) {
-//			System.out.println(dest);
-			bestPath.add(tilesMap.get(dest));
+			bestPath.add(tilesMap.get(dest));	
 			return;
 		}
 		createBestPath(tilesMap, prev, prev[dest]);
-		bestPath.add(tilesMap.get(prev[dest]));
+		bestPath.add(tilesMap.get(dest));
 		return;
 	}
 	
@@ -162,21 +156,6 @@ public class SearchAlgo {
 		System.out.print(dest + "(" + tilesMap.get(dest) + ") ");
 		return;
 	}
-//	
-	//prints shortest path from source node to every non-wall node on grid
-//	public void printDijkstra(Map<Integer, Tile> tilesMap, int[] prev, double[] prob, int source) {
-//		System.out.println("Dijkstra with Paths");
-//		for(int i = 0; i < numTiles; i++) {
-//			if(!visitedTiles.contains(tilesMap.get(i).getTileID())) {		//ignore walls
-//				continue;
-//			} 
-//			System.out.print("["+tilesMap.get(source).getX() + "]["+ tilesMap.get(source).getY() + "] " +"("+ tilesMap.get(source) + ") -->" + 
-//							 "["+tilesMap.get(i).getX() + "]["+ tilesMap.get(i).getY() + "] " + " ("+ tilesMap.get(i) + ") : "
-//							 		+ "Encounter Chance: Prob ["+ prob[i]+"] Percent = " + probToPercent(prob[i]) + "% Best Path: ");
-//			printPath(tilesMap, prev, i);
-//			System.out.println();
-//		}
-//	}
 	
 	//reverses the log of encounter chance with exponential to give readable decimal percent
 	public double probToPercent(double prob) {
@@ -201,7 +180,7 @@ public class SearchAlgo {
 		}
 	}
 	
-	//gets list of neighbors of a tile in the tile array
+	//gets list of neighbors of a tile in the tile array, used by populateAdjacencyList method
 	public List<Tile> getNeighbors(int r, int c) {
 		List<Tile> neighborsList = new ArrayList<>();
 		for(int i = -1; i <= 1; i++) {
@@ -222,7 +201,7 @@ public class SearchAlgo {
 		return neighborsList;
 	}
 	
-	//prints entire adjacency list
+	//prints adjacency list for every tile
 	public void printAdjacencyList() {
 		int id = 0;
 		for (List<Tile> tl : tile_AdjList) {
@@ -235,15 +214,32 @@ public class SearchAlgo {
 		}
 	}
 	
+	//return numeric representation of percentage from given tile's log probability
 	public double getProbPercentFromTile(int tileID) {
 		return probToPercent(prob[tileID]);
 	}
 	
+	//reset some common values
 	public void resetDijkstra() {
 		this.visitedTiles.clear();
 		this.tqueue.clear();
 		this.goalFound = false;
 		this.bestPath.clear();
 	}
-		
+	
+	/* Prints shortest path from source node to every non-wall node on grid
+	 * public void printDijkstra(Map<Integer, Tile> tilesMap, int[] prev, double[] prob, int source) {
+	 * 		System.out.println("Dijkstra with Paths");
+	 * 		for(int i = 0; i < numTiles; i++) {
+	 * 			if(!visitedTiles.contains(tilesMap.get(i).getTileID())) {		//ignore walls
+	 * 				continue;
+	 * 			} 
+	 * 			System.out.print("["+tilesMap.get(source).getX() + "]["+ tilesMap.get(source).getY() + "] " +"("+ tilesMap.get(source) + ") -->" + 
+	 * 						 "["+tilesMap.get(i).getX() + "]["+ tilesMap.get(i).getY() + "] " + " ("+ tilesMap.get(i) + ") : "
+	 * 						  + "Encounter Chance: Prob ["+ prob[i]+"] Percent = " + probToPercent(prob[i]) + "% Best Path: ");
+	 * 			printPath(tilesMap, prev, i);
+	 * 			System.out.println();
+	 * 		}
+	 * }
+	 */	
 }

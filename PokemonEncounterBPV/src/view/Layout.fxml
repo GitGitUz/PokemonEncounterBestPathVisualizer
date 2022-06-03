@@ -46,7 +46,7 @@
       </GridPane>
       <AnchorPane prefHeight="174.0" prefWidth="510.0">
          <children>
-           <ComboBox fx:id="tileChoices" layoutX="202.0" layoutY="16.0" maxWidth="105.0" onAction="#tileChosen" prefHeight="25.0" prefWidth="105.0" visibleRowCount="3">
+           <ComboBox fx:id="setChoices" layoutX="202.0" layoutY="16.0" maxWidth="105.0" onAction="#setChosen" prefHeight="25.0" prefWidth="105.0" visibleRowCount="3">
 	           <items>
 		           <FXCollections fx:factory="observableArrayList">
 			           <String fx:value="Source" />
@@ -54,17 +54,16 @@
 		           </FXCollections>
 	           </items>
            </ComboBox>
-     	   <ComboBox fx:id="terrainChoices" layoutX="203.0" layoutY="50.0" maxWidth="105.0" onAction="#terrainChosen" prefHeight="25.0" prefWidth="105.0" visibleRowCount="3">
+     	   <ComboBox fx:id="terrainChoices" layoutX="203.0" layoutY="50.0" maxWidth="105.0" onAction="#terrainChosen" prefHeight="25.0" prefWidth="105.0" visibleRowCount="5">
      	   		<items>
 		           <FXCollections fx:factory="observableArrayList">
-			           <String fx:value="Safe" />
-			           <String fx:value="Route" />
-			           <String fx:value="Tall Grass" />
-			           <String fx:value="Short Grass" />
-			           <String fx:value="Cave" />
-			           <String fx:value="Deep Sand" />
-			           <String fx:value="Wall" />
-			           
+			       		<String fx:value="Wall" />
+			            <String fx:value="Safe" />
+			           	<String fx:value="Cave" />
+			           	<String fx:value="Deep Sand" />
+			           	<String fx:value="Route" />
+			           	<String fx:value="Short Grass" />
+			            <String fx:value="Tall Grass" />
 		           </FXCollections>
 	            </items>
      	   </ComboBox>
@@ -98,7 +97,7 @@
                   <Font name="Consolas" size="15.0" />
                </font>
             </Button>
-            <Label alignment="CENTER_RIGHT" layoutX="145.0" layoutY="16.0" minWidth="48.0" prefHeight="25.0" prefWidth="50.0" text="Set Tile:">
+            <Label alignment="CENTER_RIGHT" layoutX="145.0" layoutY="16.0" minWidth="48.0" prefHeight="25.0" prefWidth="50.0" text="Set:">
                <font>
                   <Font name="Arial" size="12.0" />
                </font>

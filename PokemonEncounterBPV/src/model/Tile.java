@@ -6,8 +6,7 @@ public class Tile implements Comparator <Tile> {
 	
 	final static double encounterConst = 15.0;
 	
-	//0=wall 1=regular 2= source 3=goal
-	private int cellType;
+	private int cellType;		//0=wall 1=regular 2= source 3=goal
 	private TileType type; 
 	private int x;
 	private int y;
@@ -60,7 +59,7 @@ public class Tile implements Comparator <Tile> {
 				this.type = TileType.valueOf(type.toUpperCase());
 				setCellType(1);
 			} catch (IllegalArgumentException e) {
-				System.out.printf("'%s' is not a valid tile type\n", type);
+//				System.out.printf("'%s' is not a valid tile type\n", type);
 				System.exit(1);
 			} 
 		}
@@ -76,7 +75,7 @@ public class Tile implements Comparator <Tile> {
 			this.encounterRate = -1;
 		}else {
 			int baseRate = this.type.getBaseEncounterRate();
-			if(baseRate == 0) { // for SAFE tiles because you can't take the log of 0 so rate will simply be 0;
+			if(baseRate == 0) { 	//for SAFE tiles because you can't take the log of 0 so rate will simply be 0;
 				this.encounterRate = 0;
 			}else {
 				double prob = (baseRate * encounterConst)/1500.00;
@@ -101,13 +100,13 @@ public class Tile implements Comparator <Tile> {
 		this.y = y;
 	}
 	
-	public static double log2(double N){
+	public static double log2(double N){	//created a log function base 2
         double result = (double)(Math.log(N) / Math.log(2));
         return result;
     }
 	
 	@Override
-	public int compare(Tile t1, Tile t2) {
+	public int compare(Tile t1, Tile t2) {	//Tiles are compared based on their encounter rate, used mainly in priority queue during Dijkstra
 
 		if(t1.encounterRate < t2.encounterRate) {
 			return -1;
@@ -121,7 +120,4 @@ public class Tile implements Comparator <Tile> {
 	public String toString() {
 		return this.getTileType();
 	}
-//	public static void main(String[] args) {
-//	
-//	}
 }
